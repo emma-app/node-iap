@@ -121,7 +121,7 @@ exports.deferSubscription = function (platform, payment, deferralInfo, cb) {
 };
 
 
-exports.deferSubscription = function (platform, payment, deferralInfo, cb) {
+exports.acknowledgeSubscription = function (platform, payment, cb) {
 	function syncError(error) {
 		process.nextTick(function () {
 			cb(error);
@@ -132,22 +132,18 @@ exports.deferSubscription = function (platform, payment, deferralInfo, cb) {
 		return syncError(new Error('No payment given'));
 	}
 
-	if (!deferralInfo) {
-		return syncError(new Error('No deferralInfo given'));
-	}
-
 	const engine = platforms[platform];
 
 	if (!engine) {
 		return syncError(new Error(`Platform ${platform} not recognized`));
 	}
 
-	if (!engine.deferSubscription) {
+	if (!engine.acknowledgeSubscription) {
 		return syncError(new Error(`Platform ${platform
-		} does not have deferSubscription method`));
+		} does not have acknowledgeSubscription method`));
 	}
 
-	engine.deferSubscription(payment, deferralInfo, function (error, result) {
+	engine.acknowledgeSubscription(payment, function (error, result) {
 		if (error) {
 			return cb(error);
 		}
